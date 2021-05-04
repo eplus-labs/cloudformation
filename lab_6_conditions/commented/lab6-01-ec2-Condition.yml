@@ -1,0 +1,57 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on hardware chosen by user" 
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+
+Mappings:
+  EnvMap:
+    dev:
+      instanceType: "t2.micro"
+      name: "dev"
+    prod:
+      instanceType: "t2.small"
+      name: "prod"
+
+# Conditional operators are placed within this stanza
+Conditions:
+  # A Condition with the logical ID/mame of CreateEIPForProd is specified
+  # Note that this name ties the conditional the later usage within an Elastic IP Address resource
+  # The conditional is equals in this use case - meaning the variables in the arguments sections must
+  # be equal for the condition to be satsified
+  # The Envionment reference is a pointer to a Parameter (Environment) and determines the parameter of focus
+  # prod is the value that the parameter must match for the condition to be satsified
+  CreateEIPForProd: !Equals [!Ref Environment, prod]
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [EnvMap, !Ref Environment, instanceType]
+      ImageId: ami-0742b4e673072066f
+      Tags:
+        - Key: "Name"
+          Value: !FindInMap [EnvMap, !Ref Environment, name]
+  # Section within the Resources section creates an Elastic IP Address
+  # However - due to the inclusion of the Condition statement - the resource will only create if
+  # the referenced Condition is satsified
+  MyProdEIP:
+    Type: AWS::EC2::EIP
+    # Condition points to the logical ID/name of the Condiitons stanza
+    Condition: CreateEIPForProd
+    Properties:
+      InstanceId: !Ref Instance
+      Tags:
+        - Key: "Name"
+          Value: MyElasticIP       
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+
+
+

@@ -1,0 +1,55 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on hardware chosen by user" 
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+
+Mappings:
+  # Define the name of the mapping
+  EnvMap:
+    # Key name of "dev" is defined
+    # Key is utilized to match the parameter value that will be choosen by the user in this use case
+    dev:
+      # Under the key of dev two name/value pairs are defined for instance type declaration and name
+      # association
+      instanceType: "t2.micro"
+      name: "dev"
+    # Key name of "dev" is defined
+    # Key is utilized to match the parameter value that will be choosen by the user in this use case
+    prod:
+      # Under the key of prod two name/value pairs are defined for instance type declaration and name
+      # association
+      instanceType: "t2.small"
+      name: "prod"
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      # The FindInMap intrinsic function is called on InstanceType
+      # Detailing of FindInMap fields:
+      # EnvMap is passed as an argument and provides the association to the Mappings logical name
+      # A !Ref intrinsic function is called and points to Environment which is the Parameter that
+      # stores the user selected environment at time of CloudFormation stack creation
+      # With the Mappings association and the user parameters known - the Mapping instanceType name/value pair
+      # would be called and thus determining the EC2 instance type based on whether the environment is of
+      # name dev and of name prod
+      InstanceType: !FindInMap [EnvMap, !Ref Environment, instanceType]
+      ImageId: ami-0742b4e673072066f
+      Tags:
+        - Key: "Name"
+          # Mapping is used to dictate the Name tag attribution value
+          # Based in this YAML declaration there is no need for Tag population by user during stack creation
+          # The logic in the FindInMap intrinsic is identical to that described above for the instanceType
+          # mapping where the EnvMap points to the mapping name, !Ref gathers user parameter input value, amd
+          # name points to the name/value pair in the associated mapping section
+          Value: !FindInMap [EnvMap, !Ref Environment, name]
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+

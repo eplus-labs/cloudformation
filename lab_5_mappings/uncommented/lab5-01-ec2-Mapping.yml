@@ -1,0 +1,33 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on hardware chosen by user" 
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+
+Mappings:
+  EnvMap:
+    dev:
+      instanceType: "t2.micro"
+      name: "dev"
+    prod:
+      instanceType: "t2.small"
+      name: "prod"
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [EnvMap, !Ref Environment, instanceType]
+      ImageId: ami-0742b4e673072066f
+      Tags:
+        - Key: "Name"
+          Value: !FindInMap [EnvMap, !Ref Environment, name]
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+

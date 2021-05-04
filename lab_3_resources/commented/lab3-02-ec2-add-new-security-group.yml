@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basic EC2 Instance.
+
+Resources:
+  # The EC2 resource created in prior step is left in place
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: cfn-key-1
+      SecurityGroups:
+        - default
+        # Created the associatoion of EC2 instance to the security group (SSHSecurityGroup) 
+        # created in subsequent lines
+        - !Ref SSHSecurityGroup
+  # Creation of a secondary resource - the security group - initiating with the assignment of a 
+  # logical ID (SSHSewcurityGroup)
+  SSHSecurityGroup:
+    # Define the resource type of EC2 security group
+    Type: AWS::EC2::SecurityGroup
+    # Begin the properties section which will define the specs of the resource
+    # For a security group resource the specs will include primarily the ports/protocols and addresses of traffic
+    # which should be allowed into resource of which the security group is assigned.
+    Properties:
+      # Simple description of the resource that should be descript to identify the puroose of the resource.
+      GroupDescription: my new SSH SG
+      # Declares the direction of traffic subject to the security group rule set.
+      # In this case we are declaring the rule set will be leveraged against inbound traffic to the EC2 instance.
+      SecurityGroupIngress:
+        # Defines the IP protocol - typically TCP or UDP - of the traffic of interest.
+        - IpProtocol: tcp
+          # Defines the TCP source port
+          FromPort: '22'
+          # Defines the TCP to port for SSH
+          ToPort: '22'
+          # Defines the source IP address range allowed by the rule.
+          # In this example we are allowing all IP source addresses
+          CidrIp: 0.0.0.0/0
+  

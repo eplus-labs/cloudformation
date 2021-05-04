@@ -1,0 +1,50 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Availability Zone parameter lab
+
+# An addition to the parameters section has been added to this YAML file to allow the user to select 
+# an Availability Zone for the EC2 compute instance from a list of available options during stack creation
+Parameters:
+  MyKeyName:
+    Description: Select the key name from the list
+    Type: AWS::EC2::KeyPair::KeyName
+  # Logical ID of the parameter
+  MyAvailabilityZone:
+    # Description of the paraemeter which will be displayed to user in CloudFormation console
+    Description: Select the AZ
+    # Declare the resource type of the parameter
+    # Note that in this instance we are declaring the type as a simple string whereas in the KeyPair
+    # paramerter we used an AWS specific construct/pointer
+    Type: String
+    # Declare the default should the user not explictly choose an Availability Zone
+    Default: us-east-1a
+    # Define an array of allowed values that will be extended as options in CloudFormation console
+    AllowedValues:
+      - us-east-1a
+      - us-east-1b    
+      - us-east-1c
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default
+        - !Ref SSHSecurityGroup 
+      # Within the EC2 resource definition we reference the Parameter defined prior to allow user selection
+      # during stack creation  
+      AvailabilityZone: !Ref MyAvailabilityZone      
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+
+
+

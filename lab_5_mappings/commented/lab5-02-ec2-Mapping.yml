@@ -1,0 +1,63 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on region chosen by user" 
+
+Parameters:
+  RegionSelect:
+    Type: String
+    AllowedValues:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+
+Mappings: 
+  # Define the name of the mapping
+  RegionMap: 
+    # Key name of "us-east-1" is defined
+    # Key is utilized to match the parameter value that will be choosen by the user in this use case
+    us-east-1: 
+      # Under the key of dev two name/value pairs are defined for software/image declaration and name
+      # association
+      AMI: "ami-0742b4e673072066f"
+      name: "east1-ec2"
+    # Key name of "us-east-2" is defined
+    # Key is utilized to match the parameter value that will be choosen by the user in this use case
+    us-east-2:
+      # Under the key of dev two name/value pairs are defined for software/image declaration and name
+      # association
+      AMI: "ami-05d72852800cbf29e"
+      name: "east2-ec2"
+    # Key name of "us-west-1" is defined
+    # Key is utilized to match the parameter value that will be choosen by the user in this use case
+    us-west-1: 
+      # Under the key of dev two name/value pairs are defined for software/image declaration and name
+      # association
+      AMI: "ami-0577b787189839998"
+      name: "west1-ec2"
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: "t2.micro"
+      # The FindInMap intrinsic function is called on ImageId
+      # Detailing of FindInMap fields:
+      # RegionMap is passed as an argument and provides the association to the Mappings logical name
+      # A !Ref intrinsic function is called and points to RegionSelect which is the Parameter that
+      # stores the user selected region at time of CloudFormation stack creation
+      # With the Mappings association and the user parameters known - the Mapping AMI name/value pair
+      # would be called and thus determining the EC2 instance software image based on whether the 
+      # region is of name us-east-1, us-east-2, or us-wesr-1
+      ImageId: !FindInMap [RegionMap, !Ref RegionSelect, AMI]
+      Tags:
+        - Key: "Name"
+          # Mapping is used to dictate the Name tag attribution value
+          # Based in this YAML declaration there is no need for Tag population by user during stack creation
+          # The logic in the FindInMap intrinsic is identical to that described above for the AMI
+          # mapping where the EnvMap points to the mapping name, !Ref gathers user parameter input value, amd
+          # name points to the name/value pair in the associated mapping section
+          Value: !FindInMap [RegionMap, !Ref RegionSelect, name]
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+

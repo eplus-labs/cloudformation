@@ -1,0 +1,31 @@
+# Optional parameter
+# Per AWS documentation:
+# The AWSTemplateFormatVersion section (optional) identifies the capabilities of the template. 
+# The latest template format version is 2010-09-09 and is currently the only valid value.
+AWSTemplateFormatVersion: 2010-09-09
+# Optional parameter
+# Per AWS documentation:
+# A text string that describes the template. This section must always follow the template format version section.
+Description: Basic EC2 Instance
+
+# Resources section/stanza
+Resources:
+  # Logical ID of the instance - could be any descript string of your preference
+  DevEC2Instance:
+    # The type of the resource
+    Type: AWS::EC2::Instance
+    # Beginning of the resource specification that includes attribtues such as the OS/image of the resource, the
+    # hardware spec of the resource (instance type), etc
+    Properties:
+      # OS image name
+      ImageId: ami-0742b4e673072066f
+      # Defines hardware spec
+      InstanceType: t2.micro
+      # Dedine the key paid used for remote instance access
+      KeyName: cfn-key-1
+      # Security Group defining ingress access allowed to the instance
+      SecurityGroups:
+        - default
+
+
+    

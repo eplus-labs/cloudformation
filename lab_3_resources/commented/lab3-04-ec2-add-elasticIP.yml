@@ -1,0 +1,35 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basic EC2 Instance.
+
+Resources:
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: cfn-key-1
+      SecurityGroups:
+        - default
+        - !Ref SSHSecurityGroup
+  SSHSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Properties:
+      GroupDescription: my new SSH SG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+        - IpProtocol: tcp
+          FromPort: '8080'
+          ToPort: '8080'
+          CidrIp: 0.0.0.0/0
+  # Creation of a new Resource which we have assigned the Resource ID of MyElasticIP
+  MyElasticIP:
+    #  Tyoe of the resource is an Elastic IP Address (EIP)
+    Type: AWS::EC2::EIP
+    # Properities stanza contains the specs of the resource
+    Properties:
+      # An instrinct function reference associates the Elastic IP Address to the EC2 instance
+      # Utilizes the reference ID of the EC2 instance for association
+      InstanceId: !Ref DevEC2Instance           

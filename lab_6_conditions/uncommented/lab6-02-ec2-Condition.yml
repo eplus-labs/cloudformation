@@ -1,0 +1,70 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on hardware chosen by user" 
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+
+Mappings:
+  EnvMap:
+    dev:
+      instanceType: "t2.micro"
+      name: "dev"
+    prod:
+      instanceType: "t2.small"
+      name: "prod"
+
+Conditions:
+  CreateEIPForProd: !Equals [!Ref Environment, prod]
+  CreateDevSecurityGroup: !Equals [!Ref Environment, dev]
+  CreateProdSecurityGroup: !Equals [!Ref Environment, prod]
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [EnvMap, !Ref Environment, instanceType]
+      ImageId: ami-0742b4e673072066f
+      Tags:
+        - Key: "Name"
+          Value: !FindInMap [EnvMap, !Ref Environment, name]
+      SecurityGroups: !If [CreateDevSecurityGroup, [!Ref DevEnvSecurityGroup], [!Ref ProdEnvSecurityGroup]]  
+
+  MyProdEIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateEIPForProd
+    Properties:
+      InstanceId: !Ref Instance
+      Tags:
+        - Key: "Name"
+          Value: MyElasticIP 
+  DevEnvSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateDevSecurityGroup
+    Properties:
+      GroupDescription: DevSG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+  ProdEnvSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    Condition: CreateProdSecurityGroup
+    Properties:
+      GroupDescription: ProdSG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 4.2.2.1/32     
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+
+
+

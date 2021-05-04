@@ -1,0 +1,37 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on region chosen by user" 
+
+Parameters:
+  RegionSelect:
+    Type: String
+    AllowedValues:
+      - us-east-1
+      - us-east-2
+      - us-west-1
+
+Mappings: 
+  RegionMap: 
+    us-east-1: 
+      AMI: "ami-0742b4e673072066f"
+      name: "east1-ec2"
+    us-east-2:
+      AMI: "ami-05d72852800cbf29e"
+      name: "east2-ec2"
+    us-west-1: 
+      AMI: "ami-0577b787189839998"
+      name: "west1-ec2"
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: "t2.micro"
+      ImageId: !FindInMap [RegionMap, !Ref RegionSelect, AMI]
+      Tags:
+        - Key: "Name"
+          Value: !FindInMap [RegionMap, !Ref RegionSelect, name]
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+

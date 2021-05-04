@@ -1,0 +1,45 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Parameter Store Demo
+
+Parameters:
+  MyKeyName:
+    Description: Select the key name from the list
+    Type: AWS::EC2::KeyPair::KeyName
+  MyAvailabilityZone:
+    Description: Select the AZ
+    Type: String
+    Default: us-east-1a
+    AllowedValues:
+      - us-east-1a
+      - us-east-1b    
+      - us-east-1c
+  MyInstanceType:
+    # Description of instance and notate type will come from the Parameter Store 
+    Description: Select the ec2 instance type from the Parameter Store
+    # Type specificed SSM (System Manager) of which the Parameter Store is part of
+    # Specify the value is of type string
+    Type: AWS::SSM::Parameter::Value<String>
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: !Ref MyInstanceType
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default        
+        - !Ref SSHSecurityGroup 
+      AvailabilityZone: !Ref MyAvailabilityZone      
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+
+
+

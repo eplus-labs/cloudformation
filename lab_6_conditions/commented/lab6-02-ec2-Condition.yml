@@ -1,0 +1,81 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: "Create EC2 instance from mapping and based on hardware chosen by user" 
+
+Parameters:
+  Environment:
+    Type: String
+    AllowedValues:
+      - dev
+      - prod
+
+Mappings:
+  EnvMap:
+    dev:
+      instanceType: "t2.micro"
+      name: "dev"
+    prod:
+      instanceType: "t2.small"
+      name: "prod"
+
+Conditions:
+  # Condition for the assignment of an elastic IP address only when the prod parameter is selected and as
+  # detailed in prior lab
+  CreateEIPForProd: !Equals [!Ref Environment, prod]
+  # Condition evaluates to true when the dev parameter is sslected during stack creation
+  CreateDevSecurityGroup: !Equals [!Ref Environment, dev]
+  # Condition evaluates to true when the prod parameter is sslected during stack creation
+  CreateProdSecurityGroup: !Equals [!Ref Environment, prod]
+
+Resources:
+  Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      InstanceType: !FindInMap [EnvMap, !Ref Environment, instanceType]
+      ImageId: ami-0742b4e673072066f
+      Tags:
+        - Key: "Name"
+          Value: !FindInMap [EnvMap, !Ref Environment, name]
+      # If conditional that evaluates if the CreateDevSecurityGroup condition statement is true.
+      # If the CreateDevSecurityGroup is true - assign the DevEnvSecurityGroup security group to EC2 instance
+      # If the CreateDevSecurityGroup is false - assign the ProdEnvSecurityGroup security group to EC2 instance
+      SecurityGroups: !If [CreateDevSecurityGroup, [!Ref DevEnvSecurityGroup], [!Ref ProdEnvSecurityGroup]]  
+
+  MyProdEIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateEIPForProd
+    Properties:
+      InstanceId: !Ref Instance
+      Tags:
+        - Key: "Name"
+          Value: MyElasticIP 
+  DevEnvSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    # Condition ensures that the security group for Dev is only created if the dev parameter is selected
+    # during stack creation
+    Condition: CreateDevSecurityGroup
+    Properties:
+      GroupDescription: DevSG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+  ProdEnvSecurityGroup:
+    Type: AWS::EC2::SecurityGroup
+    # Condition ensures that the security group for Prod is only created if the prod parameter is selected
+    # during stack creation
+    Condition: CreateProdSecurityGroup
+    Properties:
+      GroupDescription: ProdSG
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 4.2.2.1/32     
+
+Outputs:
+  InstanceName:
+    Value: !Ref Instance
+
+
+

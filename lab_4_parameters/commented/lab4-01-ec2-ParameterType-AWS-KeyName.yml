@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: KeyName Parameter demo
+
+# The parameters section has been added to this YAML file to allow the user to select a key pair name
+# from a list of available options during stack creation
+Parameters:
+  # Logical ID of the parameter
+  MyKeyName:
+    # Description of the paraemeter which will be displayed to user in CloudFormation console
+    Description: Select the key name from the list
+    # Declare the resource type of the parameter
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      # Within the EC2 resource definition we have replaced the hardcoded KeyPair that was present
+      # prior with a reference to the defined parameter allowing dynamic user selection from 
+      # amongst available keys during resource creation 
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default       
+        - !Ref SSHSecurityGroup 
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+
+
+

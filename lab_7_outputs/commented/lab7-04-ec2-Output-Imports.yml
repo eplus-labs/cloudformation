@@ -1,0 +1,23 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Basic EC2 Instance
+
+Resources:
+  DevEC2Instance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: cfn-key-1
+      # Within this simmple EC2 creation YAML manifest we introduce the concept of the intrinsic function
+      # ImportValue to import values that were exported as part of the stack creation in the prior lab
+      SecurityGroups: 
+        # Within the SecurityGroups stanza and for assignment of a Security Group to the EC2 resource - the
+        # ImportValue function utilizes the value of DevSSHGlobalSG which is the name assigned to the 
+        # relational export created in the prior lab
+        - !ImportValue DevSSHGlobalSG
+      # Within the AvailabilityZone stanza the ImportValue function assigns the name of the relational
+      # export created in the prior lab
+      AvailabilityZone: !ImportValue stack-instance-1-InstanceAz
+
+
+    

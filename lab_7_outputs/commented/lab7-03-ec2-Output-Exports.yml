@@ -1,0 +1,59 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Outputs Lab - Exports
+
+Parameters:
+  MyKeyName:
+    Description: Select the key name from the list
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default     
+        - !Ref SSHSecurityGroup 
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+    
+Outputs:
+  DevInstanceId:
+    Description: My instance id
+    Value: !Ref DevEC2Instance
+  DNSName:
+    Description: Public DNS Name
+    Value: !GetAtt DevEC2Instance.PublicDnsName
+  # Our first export example utilizes the pre-exsiting InstanceAvailabilityZone Outputs stanza
+  InstanceAvailabilityZone:
+    Description: Instance Availability Zone
+    Value: !GetAtt DevEC2Instance.AvailabilityZone
+    # Declaration of an Export section stanza - contained within the InstanceAvailabilityZone stanza
+    # When the Export stanza is included within an Outputs logical ID/section - the Output of that
+    # stanza (InstanceAvailabilityZone) will be exported for use in other CloudFormation stacks
+    Export:
+      # The Sub intrinsic function is utilized to define the name of the Export as the name of the stack
+      # plus the text "-InstanceAz"
+      Name: !Sub "${AWS::StackName}-InstanceAz"
+  # Declaration of a new Outputs logical ID for Security Group assignment
+  DevGlobalSecurityGroup:
+    # The Security Group - which opens the SSH port to the EC2 instance of this YAML manifest - should only
+    # be assigned to dev (development) resources and thus the name and description in Outputs reflects this
+    Description: Dev SG
+    # The value of the Output ix assigned a value via the Ref intrinsic function and which points to the 
+    # Security Group created in the Resources stanza of this YAML manifest
+    Value: !Ref SSHSecurityGroup
+    # Declaration of an Export stanza which will provoke the export of this specific 
+    # Output (DevGlobalSecurityGroup)
+    Export:
+      # The Name of the Export in this case is explictly defined
+      Name: DevSSHGlobalSG  

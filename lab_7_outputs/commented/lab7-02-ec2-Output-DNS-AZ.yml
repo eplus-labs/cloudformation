@@ -1,0 +1,52 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Outputs Lab - DNS Name and Availability Zone Log to Console
+
+Parameters:
+  MyKeyName:
+    Description: Select the key name from the list
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default     
+        - !Ref SSHSecurityGroup 
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+
+# The Outputs section/stanza is the focus of this lab
+# We will ignore the DevInstanceId logical ID stanza as it was reviewed in the previous section    
+Outputs:
+  DevInstanceId:
+    Description: My instance id
+    Value: !Ref DevEC2Instance
+  # Logical ID of the Outputs instance with appropriate/descript name for resource DNS name retrieval
+  DNSName:
+    # Appropriate description of the Outputs instance
+    Description: Public DNS Name
+    # In this example the Value of the instance is retrieved using a GetAtt intrinsic function
+    # The first portion of the argument fed to GetAtt (DevEC2Instance) is a reference to the EC2 
+    # instance declared prior and within the Resources section of this YAML manifest
+    # The second portion of the argument fed to GetAtt (PublicDnsName) is one of several available
+    # parameters accepted and that reveals intel of the referenced compute instance.  In this case
+    # the DNS name of the referenced EC2 instance is exposed.
+    Value: !GetAtt DevEC2Instance.PublicDnsName
+  # Logical ID of the Outputs instance with appropriate/descript name for AvailabilityZone name retrieval
+  InstanceAvailabilityZone:
+    Description: Instance Availability Zone
+    # The GetAtt intrinsic function in this usage references the EC2 instance declared prior in the Resources
+    # section of this YAML manifest and is chained to the AvailabilityZone argument for retrieval of the 
+    # current Region > Avaialbility Zone that the compute instance currently resides
+    Value: !GetAtt DevEC2Instance.AvailabilityZone    

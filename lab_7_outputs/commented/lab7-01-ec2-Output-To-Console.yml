@@ -1,0 +1,40 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Outputs Lab - Log to Console
+
+Parameters:
+  MyKeyName:
+    Description: Select the key name from the list
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default     
+        - !Ref SSHSecurityGroup 
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+    
+# The Outputs section/stanza is the focus of this lab
+# In this example a single logical ID (DevInstanceId) is declared and will provoke logging of the associated
+# EC2 instance ID to the CloudFormation console.
+Outputs:
+  # The instance ID of the output
+  DevInstanceId:
+    # Simple description of the intention and usage of the output
+    Description: My instance id
+    # The value of the output as defined thru an intrinsic function call
+    # The !Ref intrinsic function points to the EC2 instance defined previously and under the Resources
+    # section of this YAML manifest
+    Value: !Ref DevEC2Instance

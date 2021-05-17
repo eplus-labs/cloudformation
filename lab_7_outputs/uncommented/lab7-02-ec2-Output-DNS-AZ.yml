@@ -1,0 +1,38 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Outputs Lab - DNS Name and Availability Zone Log to Console
+
+Parameters:
+  MyKeyName:
+    Description: Select the key name from the list
+    Type: AWS::EC2::KeyPair::KeyName
+
+Resources: 
+  DevEC2Instance: 
+    Type: 'AWS::EC2::Instance'
+    Properties: 
+      ImageId: ami-0742b4e673072066f
+      InstanceType: t2.micro
+      KeyName: !Ref MyKeyName
+      SecurityGroups:
+        - default     
+        - !Ref SSHSecurityGroup 
+  SSHSecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
+    Properties: 
+      GroupDescription: my new SSH security group
+      SecurityGroupIngress:
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+    
+Outputs:
+  DevInstanceId:
+    Description: My instance id
+    Value: !Ref DevEC2Instance
+  DNSName:
+    Description: Public DNS Name
+    Value: !GetAtt DevEC2Instance.PublicDnsName
+  InstanceAvailabilityZone:
+    Description: Instance Availability Zone
+    Value: !GetAtt DevEC2Instance.AvailabilityZone    

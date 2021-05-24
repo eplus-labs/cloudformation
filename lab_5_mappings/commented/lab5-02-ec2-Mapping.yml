@@ -18,21 +18,21 @@ Mappings:
       # Under the key of dev two name/value pairs are defined for software/image declaration and name
       # association
       AMI: "ami-0742b4e673072066f"
-      name: "east1-ec2"
+      name: "east1-ec2-1"
     # Key name of "us-east-2" is defined
     # Key is utilized to match the parameter value that will be choosen by the user in this use case
     us-east-2:
       # Under the key of dev two name/value pairs are defined for software/image declaration and name
       # association
       AMI: "ami-05d72852800cbf29e"
-      name: "east2-ec2"
+      name: "east2-ec2-1"
     # Key name of "us-west-1" is defined
     # Key is utilized to match the parameter value that will be choosen by the user in this use case
     us-west-1: 
       # Under the key of dev two name/value pairs are defined for software/image declaration and name
       # association
       AMI: "ami-0577b787189839998"
-      name: "west1-ec2"
+      name: "west1-ec2-1"
 
 Resources:
   Instance:

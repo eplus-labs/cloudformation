@@ -17,14 +17,14 @@ Mappings:
       # Under the key of dev two name/value pairs are defined for instance type declaration and name
       # association
       instanceType: "t2.micro"
-      name: "dev"
-    # Key name of "dev" is defined
+      name: "dev-1"
+    # Key name of "prod" is defined
     # Key is utilized to match the parameter value that will be choosen by the user in this use case
     prod:
       # Under the key of prod two name/value pairs are defined for instance type declaration and name
       # association
       instanceType: "t2.small"
-      name: "prod"
+      name: "prod-1"
 
 Resources:
   Instance:

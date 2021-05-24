@@ -1,0 +1,86 @@
+AWSTemplateFormatVersion: 2010-09-09
+Description: Interface Metadata Lab
+
+Parameters:
+  EnvironmentName:
+    Description: Select the environment 
+    Type: String
+    Default: dev
+    AllowedValues: 
+      - dev
+      - prod
+    ConstraintDescription: must be development or production      
+  InstanceType: 
+    Description: Select the ec2 instance type
+    Type: String
+    Default: t2.micro
+    AllowedValues: 
+      - t2.micro
+      - t2.small
+      - t2.medium
+  KeyName:
+    Description: Key name to SSH to VM's. 
+    Type: AWS::EC2::KeyPair::KeyName
+  AvailabilityZone:
+    Description: select the availability zone
+    Type: String
+    Default: us-east-2a
+    AllowedValues:
+      - us-east-2a
+      - us-east-2b
+      - us-east-2c
+
+Conditions:
+  CreateEIPForProd: !Equals [!Ref EnvironmentName, prod]
+
+Resources:
+  MyVMInstance:
+    Type: AWS::EC2::Instance
+    Properties:
+      ImageId: ami-0cd3dfa4e37921605
+      InstanceType: !Ref InstanceType
+      KeyName: !Ref KeyName
+      AvailabilityZone: !Ref AvailabilityZone
+    
+  MyProdEIP:
+    Type: AWS::EC2::EIP
+    Condition: CreateEIPForProd
+    Properties: 
+      InstanceId: !Ref MyVMInstance
+
+# Metadata stanza which in this example will be utilized for altering the appearance of the CloudFormation
+# console rendering of Parameters
+Metadata:
+  # AWS type of CloudFormation Interface dictates that the metadata stanza's that follow pertain to the
+  # console's grouping and labeling of Parameters displayed to users
+  AWS::CloudFormation::Interface:
+    # The ParameterGroups stanza is an array allowing multiple logical groups to be created
+    # The Groups defined will control the grouping of associated Parameters that follow
+    ParameterGroups:
+      # The label key dictates the heading that will appear above the logical group within the console
+      - Label:
+          # Definition of the label's default text
+          default: "EC2 Instance Configuration"
+        # The Parameters stanza dictates those that will be included within the logical group in the console    
+        Parameters:
+          # The Parameters listed in this array are references to the Parameters stanza elements established
+          # previously in this YAML manifest
+          - InstanceType
+          - KeyName
+          - AvailabilityZone  
+      - Label:
+          default: "Environment Configuration"          
+        Parameters:
+          - EnvironmentName
+    # Parameter labels are additional/optional text that will appear above the referenced individual 
+    # parameter and are often used to provide users further instruction/intent/purpose of the parameter and
+    # to aid in proper selection 
+    ParameterLabels:
+      # Parameter name created previously in this YAML manifest
+      EnvironmentName:
+        # The default label/instructions that will be displayed above the specific parameter
+        default: "This defines the environment (dev or prod) that the EC2 instance will exist in"
+      KeyName:
+        default: "Caution - store KeyName in a secure/known place as it cannot be replaced"
+          
+

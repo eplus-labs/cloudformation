@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: "Create EC2 instance from mapping and based on hardware chosen by user" 
+Description: "Create EC2 instance from mapping and based on environment chosen by user" 
 
 Parameters:
   Environment:
@@ -12,10 +12,10 @@ Mappings:
   EnvMap:
     dev:
       instanceType: "t2.micro"
-      name: "dev"
+      name: "dev-1"
     prod:
       instanceType: "t2.small"
-      name: "prod"
+      name: "prod-1"
 
 Resources:
   Instance:

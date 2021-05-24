@@ -13,13 +13,13 @@ Mappings:
   RegionMap: 
     us-east-1: 
       AMI: "ami-0742b4e673072066f"
-      name: "east1-ec2"
+      name: "east1-ec2-1"
     us-east-2:
       AMI: "ami-05d72852800cbf29e"
-      name: "east2-ec2"
+      name: "east2-ec2-1"
     us-west-1: 
       AMI: "ami-0577b787189839998"
-      name: "west1-ec2"
+      name: "west1-ec2-1"
 
 Resources:
   Instance:

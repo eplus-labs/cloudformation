@@ -56,4 +56,4 @@ Outputs:
     # Output (DevGlobalSecurityGroup)
     Export:
       # The Name of the Export in this case is explictly defined
-      Name: DevSSHGlobalSG  
+      Name: DevSSHGlobalSG-1  

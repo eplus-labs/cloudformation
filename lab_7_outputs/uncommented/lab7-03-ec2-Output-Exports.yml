@@ -42,4 +42,4 @@ Outputs:
     Description: Dev SG
     Value: !Ref SSHSecurityGroup
     Export:
-      Name: DevSSHGlobalSG  
+      Name: DevSSHGlobalSG-1  

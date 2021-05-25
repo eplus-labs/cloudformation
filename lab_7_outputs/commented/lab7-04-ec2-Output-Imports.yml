@@ -14,7 +14,7 @@ Resources:
         # Within the SecurityGroups stanza and for assignment of a Security Group to the EC2 resource - the
         # ImportValue function utilizes the value of DevSSHGlobalSG which is the name assigned to the 
         # relational export created in the prior lab
-        - !ImportValue DevSSHGlobalSG
+        - !ImportValue DevSSHGlobalSG-1
       # Within the AvailabilityZone stanza the ImportValue function assigns the name of the relational
       # export created in the prior lab
       AvailabilityZone: !ImportValue stack-instance-1-InstanceAz

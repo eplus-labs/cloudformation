@@ -9,7 +9,7 @@ Resources:
       InstanceType: t2.micro
       KeyName: cfn-key-1
       SecurityGroups: 
-        - !ImportValue DevSSHGlobalSG
+        - !ImportValue DevSSHGlobalSG-1
       AvailabilityZone: !ImportValue stack-instance-1-InstanceAz
 
 

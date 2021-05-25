@@ -1,5 +1,5 @@
 AWSTemplateFormatVersion: 2010-09-09
-Description: Basic EC2 Instance
+Description: Outputs Lab - Imports
 
 Resources:
   DevEC2Instance:
